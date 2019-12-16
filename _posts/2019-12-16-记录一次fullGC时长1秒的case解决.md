@@ -1,12 +1,13 @@
 #记录一次fullGC时长1秒的case解决
-##问题：
+
+## 问题：
 TP90 到 TP6个9 响应时间可以接受，甚至有的很快，但是会出现max 特别大的情况，只要超过500ms系统认定超时
 ![](../img/post_tp99.png)
 
 trace查看，有响应时间过长，超时的请求存在
 ![](../img/post_react_time.png)
 
-##排查：
+## 排查：
 
 具体机器，具体traceId，上下文日志，发现这些时间点服务器长达1s（其他时间每10ms都存在日志）的情况
 分析qcs-driver服务其他超时方法的日志，存在同样情况
@@ -67,7 +68,7 @@ full gc的频率不高，但是每次full gc执行时间过长，超过了系统
 1 full gc 时间过长，内存设置过大，cms-remark时间过长
 2 full gc频率是否太长，3-7天才发生一次full gc?
 
-##解决思路
+## 解决思路
 * 减少jvm 内存
     -Xmx4g
     -Xms4g
@@ -77,12 +78,13 @@ full gc的频率不高，但是每次full gc执行时间过长，超过了系统
     CMS的GC停顿时间约80%都在最终标记阶段(Final Remark)，若该阶段停顿时间过长，常见原因是新生代对老年代的无效引用，在上一阶段的并发可取消预清理阶段中，执行阈值时间内未完成循环，来不及触发Young GC，清理这些无效引用
     通过添加参数：-XX:+CMSScavengeBeforeRemark。在执行最终操作之前先触发Young GC，从而减少新生代对老年代的无效引用，降低最终标记阶段的停顿，但如果在上个阶段(并发可取消的预清理)已触发Young GC，也会重复触发Young GC
 
-##执行
+## 执行
 
-##效果
+## 效果
 
 
-##参考：
-[从实际案例聊聊Java应用的GC优化](https://tech.meituan.com/2017/12/29/jvm-optimize.html)
-[老大难的GC原理及调优](https://juejin.im/post/5b6b986c6fb9a04fd1603f4a)
-[PhantomReference导致CMS GC耗时严重](https://www.jianshu.com/p/6d37afd1f072)
+## 参考：
+
+- [从实际案例聊聊Java应用的GC优化](https://tech.meituan.com/2017/12/29/jvm-optimize.html)
+- [老大难的GC原理及调优](https://juejin.im/post/5b6b986c6fb9a04fd1603f4a)
+- [PhantomReference导致CMS GC耗时严重](https://www.jianshu.com/p/6d37afd1f072)
