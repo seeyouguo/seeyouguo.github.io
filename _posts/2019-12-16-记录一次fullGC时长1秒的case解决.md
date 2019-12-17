@@ -12,10 +12,10 @@ tags:
 
 ## 出现问题：
 TP90 到 TP6个9 响应时间可以接受，甚至有的很快，但是会出现max 特别大的情况，只要超过500ms系统认定超时
-![](https://drive.google.com/open?id=1L8rNP9eZb5WiS7E7uB1QqnYvcfSuI2T9)
+![tp99](https://i.loli.net/2019/12/17/uWLyqoSjgJPwx3i.png)
 
 trace查看，有响应时间过长，超时的请求存在
-![](https://drive.google.com/open?id=1o52kMcJUoBNkDsXTF1RWLPdg5tTmToXu)
+![](https://i.loli.net/2019/12/17/j7rIn48BHpaTsYQ.png)
 
 ## 开始排查：
 
@@ -58,9 +58,9 @@ jvm full gc time，1次500ms-1000ms （rpc调用500ms为超时时间）
 jvm memory used, 内存使用情况显示从发布那天开始，内存从几百兆开始一直上升到6G，引发full gc
 
 jvm监控:
-![full gc情况](https://drive.google.com/open?id=1QpQKzvzww9x8bDa4ZS_zShGq2RV0T3e3)
+![full gc](https://i.loli.net/2019/12/17/7RwM6vqaV1i5bnC.png)
 
-![内存使用情况](https://drive.google.com/open?id=1S-ehxTOGKLEsnUNoJZYH1ChJrvYUtrq4)
+![内存使用情况](https://i.loli.net/2019/12/17/5NrDePBLcJiHZYx.png)
 
 full gc的频率不高，但是每次full gc执行时间过长，超过了系统设置的超时时间(500ms)，服务qps10000左右，tp999为40ms，平均响应时间2ms。这样单次full gc 747ms影响十分巨大
 
@@ -69,7 +69,7 @@ full gc的频率不高，但是每次full gc执行时间过长，超过了系统
 - cms failure 的情况没有查到
 
 - cms remark 日志：
-![gc日志](https://drive.google.com/open?id=1yGBq0AmJywgQkdsHY27i4fAakZwFXrn8)
+![gc 日志](https://i.loli.net/2019/12/17/5xyt3X9YgrHGBqR.png)
 
 可以看到full gc 747ms的情况下CMS-remark 占用时间是740ms, 基本上时间都在做remark。
 
