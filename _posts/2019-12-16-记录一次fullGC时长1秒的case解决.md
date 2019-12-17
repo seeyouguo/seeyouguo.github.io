@@ -1,13 +1,23 @@
-#记录一次fullGC时长1秒的case解决
+---
+layout:     post
+title:      记录一次fullGC时长1秒的case解决
+subtitle:   JVM优化篇
+date:       2019-12-16
+author:     seeyouguo
+catalog: true
+tags:
+    - JVM
+---
 
-## 问题：
+
+## 出现问题：
 TP90 到 TP6个9 响应时间可以接受，甚至有的很快，但是会出现max 特别大的情况，只要超过500ms系统认定超时
-![](../img/post_tp99.png)
+![](https://drive.google.com/open?id=1L8rNP9eZb5WiS7E7uB1QqnYvcfSuI2T9)
 
 trace查看，有响应时间过长，超时的请求存在
-![](../img/post_react_time.png)
+![](https://drive.google.com/open?id=1o52kMcJUoBNkDsXTF1RWLPdg5tTmToXu)
 
-## 排查：
+## 开始排查：
 
 具体机器，具体traceId，上下文日志，发现这些时间点服务器长达1s（其他时间每10ms都存在日志）的情况
 分析qcs-driver服务其他超时方法的日志，存在同样情况
@@ -48,9 +58,9 @@ jvm full gc time，1次500ms-1000ms （rpc调用500ms为超时时间）
 jvm memory used, 内存使用情况显示从发布那天开始，内存从几百兆开始一直上升到6G，引发full gc
 
 jvm监控:
-![full gc情况](../img/post_full_gc.png)
+![full gc情况](https://drive.google.com/open?id=1QpQKzvzww9x8bDa4ZS_zShGq2RV0T3e3)
 
-![内存使用情况](../img/post_mem_used.png)
+![内存使用情况](https://drive.google.com/open?id=1S-ehxTOGKLEsnUNoJZYH1ChJrvYUtrq4)
 
 full gc的频率不高，但是每次full gc执行时间过长，超过了系统设置的超时时间(500ms)，服务qps10000左右，tp999为40ms，平均响应时间2ms。这样单次full gc 747ms影响十分巨大
 
@@ -59,7 +69,7 @@ full gc的频率不高，但是每次full gc执行时间过长，超过了系统
 - cms failure 的情况没有查到
 
 - cms remark 日志：
-![gc日志](../img/post_cms_remark.png)
+![gc日志](https://drive.google.com/open?id=1yGBq0AmJywgQkdsHY27i4fAakZwFXrn8)
 
 可以看到full gc 747ms的情况下CMS-remark 占用时间是740ms, 基本上时间都在做remark。
 
